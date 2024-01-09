@@ -7,7 +7,7 @@ build:
 
 run:
 	docker stop nuxt || true
-	docker rm nuxt
+	docker rm nuxt || true
 	docker run -d --name nuxt -p 3000:3000 nuxt
 
 clean:
