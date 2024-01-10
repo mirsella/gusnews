@@ -8,7 +8,7 @@ build:
 run:
 	docker stop nuxt || true
 	docker rm nuxt || true
-	docker run -d --name nuxt -p 3000:3000 nuxt
+	docker run -d --restart unless-stopped --name nuxt -p 3000:3000 nuxt
 
 clean:
 	docker stop nuxt || true
