@@ -10,6 +10,7 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       surrealdb_urls: [
+        "http://127.0.0.1:8000",
         "https://db.lemediapositif.com",
         "https://moth-rare-precisely.ngrok-free.app",
       ],
