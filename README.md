@@ -11,9 +11,14 @@ or tags @1@ 'voyage' or text_body @2@ 'voyage'
 or tags @3@ 'sensation forte' or text_body @4@ 'sensation forte'
 ```
 
+```
+define table lme as select *, search::score(0) * 10
+as score
+from news where tags @0@ 'lemediaexperience'
+```
+
 maybe a columns with images from the articles
 
-https://www.futura-sciences.com/
 https://www.geo.fr/
 https://www.en-vols.com/
 https://www.nationalgeographic.fr/

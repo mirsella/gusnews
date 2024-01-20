@@ -16,6 +16,9 @@ async function connect() {
   connected.value = false;
   const config = useRuntimeConfig();
   let urls = config.public.surrealdb_urls;
+  if (process.env.NODE_ENV === "development") {
+    urls.push("http://localhost:8000");
+  }
   if (!urls.length) {
     alert("no database urls found configured");
   }
