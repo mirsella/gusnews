@@ -19,10 +19,11 @@ from news where tags @0@ 'lemediaexperience'
 
 maybe a columns with images from the articles
 
-https://www.geo.fr/
-https://www.en-vols.com/
-https://www.nationalgeographic.fr/
-https://capturetheatlas.com/photo-tours/
+done https://www.futura-sciences.com/
+done, but no photos https://www.geo.fr/
+useless https://www.en-vols.com/
+done https://www.nationalgeographic.fr/
+done https://capturetheatlas.com/photo-tours/
 https://www.lonelyplanet.fr/
 https://www.nationalgeographic.com/pages/topic/yourshot
 https://www.magnumphotos.com/arts-culture/the-magnum-holiday-gift-guide/
