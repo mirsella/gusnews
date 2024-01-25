@@ -6,9 +6,9 @@ export type News = {
   link: string;
   provider: string;
   note: string;
-  rating?: number;
-  tags?: string[];
-  html_body?: string;
-  text_body?: string;
+  tags: string[];
+  imgs?: string;
+  html_body: string;
+  text_body: string;
   used: boolean;
 };

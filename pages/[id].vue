@@ -28,6 +28,7 @@ onMounted(async () => {
       useToast().add({
         title: "Error querying news",
         description: error as string,
+        color: "red",
         timeout: 0,
       });
     }

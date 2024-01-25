@@ -11,15 +11,14 @@ const columns = [
     sortable: true,
   },
   {
+    label: "Images",
+    key: "imgs",
+    sortable: false,
+  },
+  {
     label: "Caption",
     key: "caption",
     sortable: true,
-  },
-  {
-    label: "Rating",
-    key: "rating",
-    sortable: true,
-    direction: "desc",
   },
   {
     label: "Tags",
@@ -49,11 +48,6 @@ const columns = [
   {
     label: "Provider",
     key: "provider",
-    sortable: true,
-  },
-  {
-    label: "Id",
-    key: "id",
     sortable: true,
   },
 ];
@@ -97,24 +91,19 @@ watch(
 const news = useState<News[]>("news", () => []);
 
 const page = ref(1);
-const pageCount = ref(500);
+const pageCount = ref(300);
 watch(pageCount, async () => {
   page.value = 1;
 });
 const search = ref("");
 const onlyNonused = ref(true);
 const mindate = ref("");
-const minrating = ref(0);
 const filteredNews = computed(() => {
-  if (minrating.value < 0) minrating.value = 0;
-  if (minrating.value > 100) minrating.value = 100;
   let date = new Date(mindate.value);
   let n = news.value;
   console.log("before filter", n.length, mindate.value);
   if (onlyNonused.value) n = n.filter((n) => !n.used);
   if (mindate.value != "") n = n.filter((n) => new Date(n.date) >= date);
-  if (minrating.value != 0)
-    n = n.filter((n) => (n.rating || 0) >= minrating.value);
   if (search.value) {
     n = n.filter(
       (n) =>
@@ -158,18 +147,11 @@ if (process.client) {
 const columnsChoice = columns
   .filter((c) => c.key != "hiddenid")
   .map((c) => c.key);
-const selectedColumns = ref<string[]>([
-  "title",
-  "rating",
-  "tags",
-  "link",
-  "used",
-]);
+const selectedColumns = ref<string[]>(["title", "imgs", "link"]);
 if (process.client) {
   let localstorageColumns = window.localStorage.getItem("selectedColumns");
   if (localstorageColumns) {
     selectedColumns.value = JSON.parse(localstorageColumns);
-    selectedColumns.value.push("used");
   }
 
   let newsperpage = window.localStorage.getItem("NewsPerPage");
@@ -239,15 +221,6 @@ async function updateUsed(row: News) {
           <UInput v-model="mindate" type="date" size="lg" />
         </UTooltip>
 
-        <UTooltip text="minimum rating">
-          <UInput
-            v-model.number="minrating"
-            placeholder="minimun rating"
-            type="number"
-            size="lg"
-          />
-        </UTooltip>
-
         <UBadge color="gray">
           <UCheckbox v-model="onlyNonused" label="Non-used only" />
         </UBadge>
@@ -294,11 +267,19 @@ async function updateUsed(row: News) {
           class="w-full"
           :ui="{
             td: { base: 'max-w-[0] !p-2' },
+            tbody: 'divide-y divide-gray-200 dark:divide-slate-950',
           }"
         >
           <template #hiddenid-data="{ row }">
             {{ row.id }}
           </template>
+          <template #imgs-data="{ row }"
+            ><span
+              v-html="row.imgs"
+              class="my-4 grid grid-cols-2 gap-1 overflow-auto max-h-[30vw]"
+            >
+            </span
+          ></template>
           <template #used-data="{ row }">
             <UToggle v-model="row.used" @click="updateUsed(row)" />
           </template>
@@ -308,11 +289,6 @@ async function updateUsed(row: News) {
                 {{ row.tags?.join(", ") }}
               </div>
             </UTooltip>
-          </template>
-          <template #rating-data="{ row }">
-            <div class="w-max-full w-min">
-              {{ row.rating != -1 ? row.rating : "" }}
-            </div>
           </template>
           <template #title-data="{ row }">
             <UTooltip

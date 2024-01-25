@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { $db, $dbhelper } = useNuxtApp();
+import { parse } from "node-html-parser";
 import type { News } from "~/utils/news";
 const queryStatus = ref("waiting for the connection to the db...");
 let queryLoading = ref(true);
@@ -16,11 +17,17 @@ onMounted(async () => {
     try {
       const t1 = performance.now();
       let result = await $db.query<[News[]]>(
-        "select * omit text_body, html_body from news with index date where date >= time::now() - 1w order by date desc",
+        `
+          select * omit rating
+          from news where array::find_index(tags, 'lemediaexperience') != null
+          and date >= time::now() - 1w
+        `,
       );
       if (!result[0].length) throw new Error("no news found");
-      result[0].forEach((n) => {
+      result[0].forEach((n: News) => {
         if (n.rating === undefined) n.rating = -1;
+        let root = parse(n.html_body);
+        n.imgs = root.querySelectorAll("img").join("");
       });
       news.value = result[0] ?? [];
       const t2 = performance.now();
