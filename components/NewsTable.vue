@@ -149,19 +149,19 @@ const columnsChoice = columns
   .map((c) => c.key);
 const selectedColumns = ref<string[]>(["title", "imgs", "link"]);
 if (process.client) {
-  let localstorageColumns = window.localStorage.getItem("selectedColumns");
+  let localstorageColumns = window.localStorage.getItem("lme-selectedColumns");
   if (localstorageColumns) {
     selectedColumns.value = JSON.parse(localstorageColumns);
   }
 
-  let newsperpage = window.localStorage.getItem("NewsPerPage");
+  let newsperpage = window.localStorage.getItem("lme-NewsPerPage");
   if (newsperpage) pageCount.value = parseInt(newsperpage);
 
   watch(selectedColumns, async (v) =>
-    window.localStorage.setItem("selectedColumns", JSON.stringify(v)),
+    window.localStorage.setItem("lme-selectedColumns", JSON.stringify(v)),
   );
   watch(pageCount, async (v) =>
-    window.localStorage.setItem("NewsPerPage", v.toString()),
+    window.localStorage.setItem("lme-NewsPerPage", v.toString()),
   );
 }
 
