@@ -51,11 +51,6 @@ const columns = [
     key: "provider",
     sortable: true,
   },
-  {
-    label: "Id",
-    key: "id",
-    sortable: true,
-  },
 ];
 const toast = useToast();
 function showTips() {
@@ -169,7 +164,6 @@ if (process.client) {
   let localstorageColumns = window.localStorage.getItem("selectedColumns");
   if (localstorageColumns) {
     selectedColumns.value = JSON.parse(localstorageColumns);
-    selectedColumns.value.push("used");
   }
 
   let newsperpage = window.localStorage.getItem("NewsPerPage");
