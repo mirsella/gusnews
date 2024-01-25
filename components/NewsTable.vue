@@ -161,19 +161,19 @@ const selectedColumns = ref<string[]>([
   "used",
 ]);
 if (process.client) {
-  let localstorageColumns = window.localStorage.getItem("selectedColumns");
+  let localstorageColumns = window.localStorage.getItem("gus-selectedColumns");
   if (localstorageColumns) {
     selectedColumns.value = JSON.parse(localstorageColumns);
   }
 
-  let newsperpage = window.localStorage.getItem("NewsPerPage");
+  let newsperpage = window.localStorage.getItem("gus-NewsPerPage");
   if (newsperpage) pageCount.value = parseInt(newsperpage);
 
   watch(selectedColumns, async (v) =>
-    window.localStorage.setItem("selectedColumns", JSON.stringify(v)),
+    window.localStorage.setItem("gus-selectedColumns", JSON.stringify(v)),
   );
   watch(pageCount, async (v) =>
-    window.localStorage.setItem("NewsPerPage", v.toString()),
+    window.localStorage.setItem("gus-NewsPerPage", v.toString()),
   );
 }
 
