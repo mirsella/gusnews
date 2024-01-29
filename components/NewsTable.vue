@@ -97,7 +97,10 @@ watch(pageCount, async () => {
 });
 const search = ref("");
 const onlyNonused = ref(true);
-const mindate = ref("");
+let date = new Date();
+date.setHours(0, 0, 0, 0);
+date.setDate(date.getDate() - 2);
+const mindate = ref(date.toISOString().split("T")[0]);
 const filteredNews = computed(() => {
   let date = new Date(mindate.value);
   let n = news.value;
