@@ -19,8 +19,8 @@ onMounted(async () => {
       let result = await $db.query<[News[]]>(
         `
           select * omit rating
-          from news where array::find_index(tags, 'lemediaexperience') != null
-          and date >= time::now() - 1w
+          from news with index date where date >= time::now() - 1w
+          and array::find_index(tags, 'lemediaexperience') != null
         `,
       );
       if (!result[0].length) throw new Error("no news found");
