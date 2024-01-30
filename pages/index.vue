@@ -19,13 +19,11 @@ onMounted(async () => {
       let result = await $db.query<[News[]]>(
         `
           select * omit rating
-          from news with index date where date >= time::now() - 1w
-          and array::find_index(tags, 'lemediaexperience') != null
+          from lme with index date where date >= time::now() - 1w
         `,
       );
       if (!result[0].length) throw new Error("no news found");
       result[0].forEach((n: News) => {
-        if (n.rating === undefined) n.rating = -1;
         let root = parse(n.html_body);
         n.imgs = root.querySelectorAll("img").join("");
       });
