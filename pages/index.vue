@@ -19,7 +19,7 @@ onMounted(async () => {
       let result = await $db.query<[News[]]>(
         `
           select * omit rating
-          from news with index date where date >= time::now() - 1w
+          from news where date >= time::now() - 1w
           and array::find_index(tags, 'lemediaexperience') != null
         `,
       );
