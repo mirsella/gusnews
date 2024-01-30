@@ -1,6 +1,0 @@
-#V2
-info for db
-select * omit text_body,html_text from news with index date where date >= time::now() - 1w order by date desc
-select * omit text_body,html_text from news with index date where date >= time::now() - 1w AND array::find_index(tags, 'lemediaexperience') == null order by date desc
-select * omit text_body,html_text from news where date >= time::now() - 1w AND array::find_index(tags, 'lemediaexperience') == null order by date desc
-select * omit text_body,html_text from news with index date where date >= time::now() - 1w AND array::find_index(tags, 'lemediaexperience') == null order by date desc
