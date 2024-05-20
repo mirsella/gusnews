@@ -21,7 +21,7 @@ async function signout() {
             alt="logo"
             class="h-8 w-8 inline-block"
           />
-          Le Media Experience</span
+          Le Média Expérience</span
         >
         <span class="sm:hidden mt-2">
           <UIcon name="i-heroicons-home" />
