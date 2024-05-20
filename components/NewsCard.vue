@@ -82,7 +82,7 @@ async function updateNews(field?: keyof News) {
           <div class="flex flex-wrap">
             <div
               v-for="tag of news.tags"
-              class="m-[0.1rem] bg-green-500 rounded-lg px-1 group relative inline-block overflow-hidden"
+              class="m-[0.1rem] bg-blue-500 rounded-lg px-1 group relative inline-block overflow-hidden"
               @click="
                 news.tags = news.tags?.filter((t) => t !== tag);
                 updateNews('tags');

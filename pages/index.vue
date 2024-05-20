@@ -23,11 +23,14 @@ onMounted(async () => {
         `,
       );
       if (!result[0].length) throw new Error("no news found");
-      result[0].forEach((n: News) => {
-        let root = parse(n.html_body);
-        n.imgs = root.querySelectorAll("img").join("");
-      });
-      news.value = result[0] ?? [];
+      let res = result[0]
+        .map((n: News) => {
+          let root = parse(n.html_body);
+          n.imgs = root.querySelectorAll("img").join("");
+          return n;
+        })
+        .filter((n: News) => n.imgs?.length || 0 > 0);
+      news.value = res ?? [];
       const t2 = performance.now();
       const totaltime = (t2 - t1).toFixed(0);
       queryStatus.value = `loaded ${news.value.length} news in ${totaltime}ms.`;

@@ -15,7 +15,14 @@ async function signout() {
         class="text-2xl self-start cursor-pointer transition hover:scale-110"
         href="/"
       >
-        <span class="hidden sm:block"> Le Media Experience 🏄</span>
+        <span class="hidden sm:inline-block">
+          <img
+            src="../assets/logo-lme.png"
+            alt="logo"
+            class="h-8 w-8 inline-block"
+          />
+          Le Media Experience</span
+        >
         <span class="sm:hidden mt-2">
           <UIcon name="i-heroicons-home" />
         </span>
@@ -24,7 +31,7 @@ async function signout() {
         <ClientOnly>
           <UBadge
             class="text-sm md:text-xl mx-1"
-            :color="$dbhelper?.connected.value ? 'green' : 'red'"
+            :color="$dbhelper?.connected.value ? 'blue' : 'red'"
           >
             connection
             <UIcon
@@ -40,7 +47,7 @@ async function signout() {
           </UBadge>
           <UBadge
             class="text-sm md:text-xl mx-1"
-            :color="$dbhelper?.authenticated.value ? 'green' : 'red'"
+            :color="$dbhelper?.authenticated.value ? 'blue' : 'red'"
           >
             authentication
             <UIcon
