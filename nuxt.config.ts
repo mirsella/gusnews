@@ -12,6 +12,7 @@ export default defineNuxtConfig({
       surrealdb_urls: [
         "https://db.lemediapositif.com",
         "https://moth-rare-precisely.ngrok-free.app",
+        "http://vps.mirsella.mooo.com:3000",
       ],
     },
   },
