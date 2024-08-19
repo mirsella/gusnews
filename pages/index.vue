@@ -15,9 +15,8 @@ onMounted(async () => {
     await $db.ready;
     try {
       const t1 = performance.now();
-      // NOTE: is the order by useful ?
       let result = await $db.query<[News[]]>(
-        "select * omit text_body, html_body from fr_feed order by date desc",
+        "select * omit text_body, html_body from fr_feed",
       );
       if (!result[0].length) throw new Error("no news found");
       result[0].forEach((n) => {
