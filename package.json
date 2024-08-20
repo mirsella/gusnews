@@ -11,13 +11,13 @@
   },
   "devDependencies": {
     "@nuxt/devtools": "latest",
-    "@nuxt/ui": "^2.9.0",
-    "nuxt": "^3.8.0",
-    "vue": "^3.3.6",
-    "vue-router": "^4.2.5"
+    "@nuxt/ui": "^2.18.4",
+    "nuxt": "^3.12.4",
+    "vue": "^3.4.38",
+    "vue-router": "^4.4.3"
   },
   "dependencies": {
-    "@iconify-json/carbon": "^1.1.21",
-    "surrealdb.js": "^0.11.0"
+    "@iconify-json/carbon": "^1.1.37",
+    "surrealdb.js": "^0.11.1"
   }
 }
