@@ -64,64 +64,62 @@ async function signup() {
 
 <template>
   <div class="p-4 flex justify-center">
-    <ClientOnly fallback="Loading login page...">
-      <UCard
-        class="p-2 w-full md:w-1/2"
-        v-if="$dbhelper?.connected.value === true"
-        v-on:keyup.enter="signin"
-      >
-        <template #header>
-          {{
-            $route.query.expired === null
-              ? "your connection has expired. please login again"
-              : "You need to login to access this page"
-          }}
-        </template>
-        <h1 v-if="user.length < 1" class="font-thin">
-          Username needs to be at least 1 character
-        </h1>
-        <UInput
-          class="mb-2"
-          size="xl"
-          placeholder="Username"
-          v-model="user"
-          :required="true"
-          minlength="1"
-          autofocus
-        />
-        <h1 v-if="password.length < 1" class="font-thin">
-          Password needs to be at least 1 character
-        </h1>
-        <UInput
-          class="mb-2"
-          size="xl"
-          placeholder="Password"
-          v-model="password"
-          type="password"
-          :required="true"
-          minlength="1"
-        />
-        <template #footer>
-          <div class="w-full flex justify-around">
-            <UButton
-              id="signin"
-              size="xl"
-              :loading="isLoading"
-              :disabled="!areFieldsValid"
-              @click="signin"
-              >Sign in</UButton
-            >
-            <UButton
-              id="signup"
-              size="xl"
-              :loading="isLoading"
-              :disabled="!areFieldsValid"
-              @click="signup"
-              >Sign up</UButton
-            >
-          </div>
-        </template>
-      </UCard>
-    </ClientOnly>
+    <UCard
+      class="p-2 w-full md:w-1/2"
+      v-if="$dbhelper?.connected.value === true"
+      v-on:keyup.enter="signin"
+    >
+      <template #header>
+        {{
+          $route.query.expired === null
+            ? "your connection has expired. please login again"
+            : "You need to login to access this page"
+        }}
+      </template>
+      <h1 v-if="user.length < 1" class="font-thin">
+        Username needs to be at least 1 character
+      </h1>
+      <UInput
+        class="mb-2"
+        size="xl"
+        placeholder="Username"
+        v-model="user"
+        :required="true"
+        minlength="1"
+        autofocus
+      />
+      <h1 v-if="password.length < 1" class="font-thin">
+        Password needs to be at least 1 character
+      </h1>
+      <UInput
+        class="mb-2"
+        size="xl"
+        placeholder="Password"
+        v-model="password"
+        type="password"
+        :required="true"
+        minlength="1"
+      />
+      <template #footer>
+        <div class="w-full flex justify-around">
+          <UButton
+            id="signin"
+            size="xl"
+            :loading="isLoading"
+            :disabled="!areFieldsValid"
+            @click="signin"
+            >Sign in</UButton
+          >
+          <UButton
+            id="signup"
+            size="xl"
+            :loading="isLoading"
+            :disabled="!areFieldsValid"
+            @click="signup"
+            >Sign up</UButton
+          >
+        </div>
+      </template>
+    </UCard>
   </div>
 </template>

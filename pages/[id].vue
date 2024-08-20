@@ -66,9 +66,7 @@ onMounted(async () => {
 </script>
 <template>
   <div class="m-4">
-    <ClientOnly>
-      <NewsCard v-if="news?.id" :news="news" />
-      <NotFound v-else />
-    </ClientOnly>
+    <NewsCard v-if="news?.id" :news="news" />
+    <NotFound v-else />
   </div>
 </template>

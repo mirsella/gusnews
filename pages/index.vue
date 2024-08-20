@@ -93,43 +93,34 @@ async function copyDedicatedLink() {
 
 <template>
   <div>
-    <ClientOnly>
-      <UModal
-        v-model="isOpen"
-        :transition="false"
-        :ui="{ width: 'md:max-w-[80%]' }"
-      >
-        <div v-show="n.id" class="flex justify-center">
-          <UTooltip text="Open in a dedicated page">
-            <UButton
-              class="w-8 m-1 transition hover:scale-110"
-              icon="i-carbon-export"
-              @click="navigateTo('/' + n.id)"
-            />
-          </UTooltip>
-          <UTooltip text="Copy dedicated link to clipboard">
-            <UButton
-              class="w-8 m-1 transition hover:scale-110"
-              :icon="clipboardIcon"
-              @click="copyDedicatedLink"
-            />
-          </UTooltip>
-        </div>
-        <NewsCard v-if="n.id" :news="n" />
-        <NotFound v-else class="m-4" />
-      </UModal>
-    </ClientOnly>
-    <ClientOnly>
-      <h1 class="text-lg font-bold w-full text-center">
-        <UButton
-          :label="queryStatus"
-          loading
-          v-if="queryLoading"
-          class="mb-2"
-        />
-        <span v-else> {{ queryStatus }} </span>
-      </h1>
-    </ClientOnly>
+    <UModal
+      v-model="isOpen"
+      :transition="false"
+      :ui="{ width: 'md:max-w-[80%]' }"
+    >
+      <div v-show="n.id" class="flex justify-center">
+        <UTooltip text="Open in a dedicated page">
+          <UButton
+            class="w-8 m-1 transition hover:scale-110"
+            icon="i-carbon-export"
+            @click="navigateTo('/' + n.id)"
+          />
+        </UTooltip>
+        <UTooltip text="Copy dedicated link to clipboard">
+          <UButton
+            class="w-8 m-1 transition hover:scale-110"
+            :icon="clipboardIcon"
+            @click="copyDedicatedLink"
+          />
+        </UTooltip>
+      </div>
+      <NewsCard v-if="n.id" :news="n" />
+      <NotFound v-else class="m-4" />
+    </UModal>
+    <h1 class="text-lg font-bold w-full text-center">
+      <UButton :label="queryStatus" loading v-if="queryLoading" class="mb-2" />
+      <span v-else> {{ queryStatus }} </span>
+    </h1>
     <NewsTable :loading="queryLoading" class="mx-4" />
   </div>
 </template>

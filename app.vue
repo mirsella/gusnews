@@ -12,7 +12,5 @@ onMounted(async () => {
 <template>
   <Header />
   <NuxtPage />
-  <ClientOnly>
-    <UNotifications />
-  </ClientOnly>
+  <UNotifications />
 </template>

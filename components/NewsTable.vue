@@ -128,7 +128,7 @@ const paginedNews = computed(() =>
     page.value * pageCount.value,
   ),
 );
-if (process.client) {
+if (import.meta.client) {
   watch(
     paginedNews,
     (paginedNews) => {
@@ -160,7 +160,7 @@ const selectedColumns = ref<string[]>([
   "link",
   "used",
 ]);
-if (process.client) {
+if (import.meta.client) {
   let localstorageColumns = window.localStorage.getItem("gus-selectedColumns");
   if (localstorageColumns) {
     selectedColumns.value = JSON.parse(localstorageColumns);
@@ -270,97 +270,93 @@ async function updateUsed(row: News) {
                 </span>
               </template>
             </UInput>
-            <ClientOnly>
-              <UPagination
-                v-model="page"
-                :page-count="pageCount"
-                :total="filteredNews.length"
-              />
-            </ClientOnly>
+            <UPagination
+              v-model="page"
+              :page-count="pageCount"
+              :total="filteredNews.length"
+            />
           </div>
         </UBadge>
       </div>
-      <ClientOnly>
-        <UTable
-          :loading="loading"
-          :rows="paginedNews"
-          :columns="filteredColumns"
-          class="w-full"
-          :ui="{
-            td: { base: 'max-w-[0] !p-2' },
-          }"
-        >
-          <template #hiddenid-data="{ row }">
-            {{ row.id }}
-          </template>
-          <template #used-data="{ row }">
-            <UToggle v-model="row.used" @click="updateUsed(row)" />
-          </template>
-          <template #tags-data="{ row }">
-            <UTooltip :text="row.tags?.join(', ')">
-              <div class="h-10 whitespace-normal truncate max-w-full">
-                {{ row.tags?.join(", ") }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #rating-data="{ row }">
-            <div class="w-max-full w-min">
-              {{ row.rating != -1 ? row.rating : "" }}
+      <UTable
+        :loading="loading"
+        :rows="paginedNews"
+        :columns="filteredColumns"
+        class="w-full"
+        :ui="{
+          td: { base: 'max-w-[0] !p-2' },
+        }"
+      >
+        <template #hiddenid-data="{ row }">
+          {{ row.id }}
+        </template>
+        <template #used-data="{ row }">
+          <UToggle v-model="row.used" @click="updateUsed(row)" />
+        </template>
+        <template #tags-data="{ row }">
+          <UTooltip :text="row.tags?.join(', ')">
+            <div class="h-10 whitespace-normal truncate max-w-full">
+              {{ row.tags?.join(", ") }}
             </div>
-          </template>
-          <template #title-data="{ row }">
-            <UTooltip
-              :text="row.title"
-              class="whitespace-normal truncate h-10 max-w-full"
+          </UTooltip>
+        </template>
+        <template #rating-data="{ row }">
+          <div class="w-max-full w-min">
+            {{ row.rating != -1 ? row.rating : "" }}
+          </div>
+        </template>
+        <template #title-data="{ row }">
+          <UTooltip
+            :text="row.title"
+            class="whitespace-normal truncate h-10 max-w-full"
+          >
+            <div>
+              {{ row.title }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #caption-data="{ row }">
+          <UTooltip :text="row.caption">
+            <div class="whitespace-normal truncate h-10 max-w-full">
+              {{ row.caption }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #link-data="{ row }">
+          <UTooltip :text="row.link" class="max-w-full">
+            <a
+              :href="row.link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="whitespace-normal truncate max-h-10 max-w-full"
+              >{{ row.link }}</a
             >
-              <div>
-                {{ row.title }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #caption-data="{ row }">
-            <UTooltip :text="row.caption">
-              <div class="whitespace-normal truncate h-10 max-w-full">
-                {{ row.caption }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #link-data="{ row }">
-            <UTooltip :text="row.link" class="max-w-full">
-              <a
-                :href="row.link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="whitespace-normal truncate max-h-10 max-w-full"
-                >{{ row.link }}</a
-              >
-            </UTooltip>
-          </template>
-          <template #note-data="{ row }">
-            <UTooltip :text="row.note">
-              <div class="whitespace-normal truncate h-10 max-w-full">
-                {{ row.note }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #id-data="{ row }">
-            <UTooltip :text="row.id">
-              <div
-                class="max-w-full whitespace-normal text-ellipsis break-all max-h-10"
-              >
-                {{ row.id.split(":")[1] }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #date-data="{ row }">
-            <UTooltip :text="new Date(row.date).toLocaleString()">
-              <div class="max-w-full whitespace-normal text-ellipsis w-min">
-                {{ new Date(row.date).toLocaleString() }}
-              </div>
-            </UTooltip>
-          </template>
-        </UTable>
-      </ClientOnly>
+          </UTooltip>
+        </template>
+        <template #note-data="{ row }">
+          <UTooltip :text="row.note">
+            <div class="whitespace-normal truncate h-10 max-w-full">
+              {{ row.note }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #id-data="{ row }">
+          <UTooltip :text="row.id">
+            <div
+              class="max-w-full whitespace-normal text-ellipsis break-all max-h-10"
+            >
+              {{ row.id.split(":")[1] }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #date-data="{ row }">
+          <UTooltip :text="new Date(row.date).toLocaleString()">
+            <div class="max-w-full whitespace-normal text-ellipsis w-min">
+              {{ new Date(row.date).toLocaleString() }}
+            </div>
+          </UTooltip>
+        </template>
+      </UTable>
     </UCard>
   </div>
 </template>
