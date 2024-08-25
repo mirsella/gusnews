@@ -15,6 +15,8 @@ export default defineNuxtConfig({
       surrealdb_urls: [
         "https://db.lemediapositif.com",
         "http://vps.mirsella.mooo.com:3000",
+        "http://lmp.mirsella.mooo.com:8000",
+        "http://lmp.mirsella.mooo.com/db",
       ],
     },
   },
