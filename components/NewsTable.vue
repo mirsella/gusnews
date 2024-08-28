@@ -131,13 +131,14 @@ const paginedNews = computed(() =>
 if (import.meta.client) {
   watch(
     paginedNews,
-    (paginedNews) => {
+    () => {
       setTimeout(async () => {
         const els = document.querySelectorAll("tbody > tr");
         console.log("registering click events", els.length);
         for (let el of els) {
           el.addEventListener("click", (event) => {
             const parent = el;
+            // @ts-ignore localName exists
             if (event.target?.localName === "td") {
               const id = parent.children[0].textContent;
               if (id) navigateTo({ query: { id } });
@@ -189,7 +190,7 @@ const filteredColumns = computed(() => {
 async function updateUsed(row: News) {
   // need to inverse the value because the UI has not updated it yet
   const used = !row.used;
-  const res = await $db.merge<News>(row.id, { used });
+  const res = await $db.merge<News>("news:" + row.id.split(":")[1], { used });
   if (!res[0]) {
     setTimeout(async () => {
       row.used = true;
@@ -281,7 +282,7 @@ async function updateUsed(row: News) {
       <UTable
         :loading="loading"
         :rows="paginedNews"
-        :columns="filteredColumns"
+        :columns="filteredColumns as any"
         class="w-full"
         :ui="{
           td: { base: 'max-w-[0] !p-2' },

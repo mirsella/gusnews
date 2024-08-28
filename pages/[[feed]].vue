@@ -25,6 +25,7 @@ onMounted(async () => {
       if (!result[0].length) throw new Error("no news found");
       result[0].forEach((n) => {
         if (n.rating === undefined) n.rating = -1;
+        n.id = "news:" + n.id.split(":")[1];
       });
       news.value = result[0] ?? [];
       const t2 = performance.now();

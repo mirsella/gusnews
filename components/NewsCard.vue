@@ -76,7 +76,7 @@ async function updateNews(field?: keyof News) {
       ? { [field]: news.value[field] }
       : news.value;
     console.log("update", update);
-    await $db?.merge<News>(news.value.id, update);
+    await $db?.merge<News>("news:" + news.value.id.split(":")[1], update);
   } catch (error: any) {
     useToast().add({
       title: "Error saving news",
