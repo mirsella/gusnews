@@ -19,7 +19,7 @@ onMounted(async () => {
     try {
       const t1 = performance.now();
       let result = await $db.query<[News[]]>(
-        "select * omit text_body, html_body from type::table($table)",
+        "select * omit text_body, html_body from type::table($table) order by date desc",
         { table: table + "_feed" },
       );
       if (!result[0].length) throw new Error("no news found");
@@ -33,7 +33,7 @@ onMounted(async () => {
       queryStatus.value = `loaded ${news.value.length} news in ${totaltime}ms.`;
       queryLoading.value = false;
     } catch (e: any) {
-      if (process.server) return;
+      if (import.meta.server) return;
       useToast().add({
         title: "Error querying news",
         description: e.toString(),
