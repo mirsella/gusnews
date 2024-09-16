@@ -16,7 +16,7 @@ onMounted(async () => {
     }
     try {
       const res = await $db.query<[News]>(
-        "select * from only news where id = $id",
+        "select * from only news where id = $id order by date desc",
         {
           id: route.params.id,
         },
