@@ -17,7 +17,7 @@ onMounted(async () => {
     try {
       const t1 = performance.now();
       let result = await $db.query<[News[]]>(
-        `select * omit rating from lme_feed order by date desc`,
+        `select * omit rating from news where 'lme' inside tags order by date desc`,
       );
       if (!result[0].length) throw new Error("no news found");
       let res = result[0]

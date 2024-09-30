@@ -1,5 +1,6 @@
 export type News = {
   id: string;
+  rating?: number;
   title: string;
   caption: string;
   date: Date;
