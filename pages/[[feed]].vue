@@ -4,7 +4,7 @@ import type { News } from "~/utils/news";
 const route = useRoute();
 const news = useState<News[]>("news", () => []);
 
-const table: string = (route.params.feed as string) || "fr";
+const region: string = (route.params.feed as string) || "fr";
 
 const queryStatus = ref("waiting for the connection to the db...");
 let queryLoading = ref(true);
@@ -19,8 +19,8 @@ onMounted(async () => {
     try {
       const t1 = performance.now();
       let result = await $db.query<[News[]]>(
-        "select * omit text_body, html_body from type::table($table) order by date desc",
-        { table: table + "_feed" },
+        "select * omit text_body, html_body from news where date >= time::now() - 1w AND $region INSIDE tags order by date desc",
+        { region },
       );
       if (!result[0].length) throw new Error("no news found");
       result[0].forEach((n) => {
@@ -45,26 +45,25 @@ onMounted(async () => {
 
   try {
     await $db.wait();
-    const liveQueryUuid = await $db?.live(
-      table + "_feed",
-      ({ action, result }) => {
-        if (!result) return;
-        if (result.rating === undefined) result.rating = -1;
-        switch (action) {
-          case "CREATE":
-            news.value.unshift(result as News);
-            break;
-          case "UPDATE":
-            const index = news.value.findIndex((n) => n.id === result.id);
-            if (index !== -1) news.value[index] = result as News;
-            break;
-          case "DELETE":
-            const index2 = news.value.findIndex((n) => n.id === result.id);
-            if (index2 !== -1) news.value.splice(index2, 1);
-            break;
-        }
-      },
-    );
+    const liveQueryUuid = await $db?.live("news", ({ action, result }) => {
+      if (!result) return;
+      let new_news = result as News;
+      if (new_news.rating === undefined) new_news.rating = -1;
+      if (!new_news.tags?.includes(region)) return;
+      switch (action) {
+        case "CREATE":
+          news.value.unshift(new_news);
+          break;
+        case "UPDATE":
+          const index = news.value.findIndex((n) => n.id === new_news.id);
+          if (index !== -1) news.value[index] = result as News;
+          break;
+        case "DELETE":
+          const index2 = news.value.findIndex((n) => n.id === new_news.id);
+          if (index2 !== -1) news.value.splice(index2, 1);
+          break;
+      }
+    });
     onUnmounted(async () => {
       await $db?.kill(liveQueryUuid);
     });
