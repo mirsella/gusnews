@@ -22,6 +22,12 @@ const columns = [
     direction: "desc",
   },
   {
+    label: "Rating Travel",
+    key: "rating_travel",
+    sortable: true,
+    direction: "desc",
+  },
+  {
     label: "Tags",
     key: "tags",
     sortable: true,
@@ -234,7 +240,7 @@ async function updateUsed(row: News) {
           <UInput v-model="mindate" type="date" size="lg" />
         </UTooltip>
 
-        <UTooltip text="minimum rating">
+        <UTooltip text="minimum rating (only normal, not travel">
           <UInput
             v-model.number="minrating"
             placeholder="minimun rating"
@@ -304,6 +310,11 @@ async function updateUsed(row: News) {
         <template #rating-data="{ row }">
           <div class="w-max-full w-min">
             {{ row.rating != -1 ? row.rating : "" }}
+          </div>
+        </template>
+        <template #rating_travel-data="{ row }">
+          <div class="w-max-full w-min">
+            {{ row.rating_travel != -1 ? row.rating_travel : "" }}
           </div>
         </template>
         <template #title-data="{ row }">

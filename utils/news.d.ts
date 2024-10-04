@@ -7,6 +7,7 @@ export type News = {
   provider: string;
   note: string;
   rating?: number;
+  rating_travel?: number;
   tags?: string[];
   html_body?: string;
   text_body?: string;

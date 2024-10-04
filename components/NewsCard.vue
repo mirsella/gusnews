@@ -58,6 +58,9 @@ watch(
       if (news.value.rating === -1) {
         news.value.rating = undefined;
       }
+      if (news.value.rating_travel === -1) {
+        news.value.rating_travel = undefined;
+      }
     }
   },
   { deep: true, immediate: true },
@@ -70,6 +73,13 @@ async function updateNews(field?: keyof News) {
   await new Promise((resolve) => setTimeout(resolve, 10));
   if (!news.value.rating || news.value.rating < 0 || news.value.rating > 100) {
     news.value.rating = 0;
+  }
+  if (
+    !news.value.rating_travel ||
+    news.value.rating_travel < 0 ||
+    news.value.rating_travel > 100
+  ) {
+    news.value.rating_travel = 0;
   }
   try {
     const update: Partial<News> = field
@@ -108,6 +118,25 @@ async function updateNews(field?: keyof News) {
             }"
           >
             <template #trailing>rating</template>
+          </UInput>
+        </UBadge>
+        <UBadge class="m-1">
+          <UInput
+            variant="none"
+            v-model.number="news.rating_travel"
+            placeholder="0"
+            @input="updateNews('rating_travel')"
+            type="number"
+            max="100"
+            min="0"
+            color="primary"
+            class="w-[6.5rem]"
+            :ui="{
+              trailing: { padding: { sm: 'pe-12' } },
+              padding: { sm: 'p-0' },
+            }"
+          >
+            <template #trailing>rating travel</template>
           </UInput>
         </UBadge>
         <UBadge class="m-1">
