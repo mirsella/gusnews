@@ -4,7 +4,7 @@ import type { News } from "~/utils/news";
 const route = useRoute();
 const news = useState<News[]>("news", () => []);
 
-const region: string = (route.params.feed as string) || "fr";
+const region: string = route.params.feed as string;
 
 const queryStatus = ref("waiting for the connection to the db...");
 let queryLoading = ref(true);
@@ -18,10 +18,17 @@ onMounted(async () => {
     await $db.ready;
     try {
       const t1 = performance.now();
-      let result = await $db.query<[News[]]>(
-        "select * omit text_body, html_body from news where date >= time::now() - 1w AND $region INSIDE tags order by date desc",
-        { region },
-      );
+      let result;
+      if (region) {
+        result = await $db.query<[News[]]>(
+          "select * omit text_body, html_body from news where date >= time::now() - 1w AND $region INSIDE tags order by date desc",
+          { region },
+        );
+      } else {
+        result = await $db.query<[News[]]>(
+          "select * omit text_body, html_body from news where date >= time::now() - 1w order by date desc",
+        );
+      }
       if (!result[0].length) throw new Error("no news found");
       result[0].forEach((n) => {
         if (n.rating === undefined) n.rating = -1;
