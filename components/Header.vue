@@ -5,16 +5,13 @@ async function signout() {
   $db.invalidate();
   $dbhelper.authenticated.value = false;
   window.localStorage.removeItem("jwt");
-  navigateTo("/login");
+  await navigateTo("/login");
 }
 </script>
 <template>
   <div>
     <div class="inline-flex w-full pt-1 md:py-4 px-4 h-auto">
-      <a
-        class="text-2xl self-start cursor-pointer transition hover:scale-110"
-        href="/"
-      >
+      <dev class="text-2xl self-start">
         <span class="hidden sm:inline-block">
           <img
             src="../assets/logo-lme.png"
@@ -26,7 +23,7 @@ async function signout() {
         <span class="sm:hidden mt-2">
           <UIcon name="i-heroicons-home" />
         </span>
-      </a>
+      </dev>
       <div class="flex-grow self-center text-center">
         <UBadge
           class="text-sm md:text-xl mx-1"
