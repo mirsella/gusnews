@@ -130,9 +130,9 @@ async function updateNews(field?: keyof News) {
             max="100"
             min="0"
             color="primary"
-            class="w-[6.5rem]"
+            class="w-[8rem]"
             :ui="{
-              trailing: { padding: { sm: 'pe-12' } },
+              trailing: { padding: { sm: 'pe-20' } },
               padding: { sm: 'p-0' },
             }"
           >
