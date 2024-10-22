@@ -15,68 +15,57 @@ async function signout() {
         class="text-2xl self-start cursor-pointer transition hover:scale-110"
         href="/"
       >
-        <span class="hidden sm:inline-block">
-          <img
-            src="../assets/logo-lme.png"
-            alt="logo"
-            class="h-8 w-8 inline-block"
-          />
-          Le Média Expérience</span
-        >
+        <span class="hidden sm:block"> Gusnews </span>
         <span class="sm:hidden mt-2">
           <UIcon name="i-heroicons-home" />
         </span>
       </a>
       <div class="flex-grow self-center text-center">
-        <ClientOnly>
-          <UBadge
-            class="text-sm md:text-xl mx-1"
-            :color="$dbhelper?.connected.value ? 'blue' : 'red'"
-          >
-            connection
-            <UIcon
-              v-if="$dbhelper?.connected.value"
-              name="i-carbon-connection-signal"
-              class="h-4 w-4 md:h-5 md:w-5 ml-1"
-            />
-            <UIcon
-              v-else
-              name="i-carbon-connection-signal-off"
-              class="h-4 w-4 md:h-5 md:w-5 ml-1"
-            />
-          </UBadge>
-          <UBadge
-            class="text-sm md:text-xl mx-1"
-            :color="$dbhelper?.authenticated.value ? 'blue' : 'red'"
-          >
-            authentication
-            <UIcon
-              v-if="$dbhelper?.authenticated.value"
-              name="i-carbon-rule-locked"
-              class="h-4 w-4 md:h-5 md:w-5 ml-1"
-            />
-            <UIcon
-              v-else
-              name="i-carbon-rule-cancelled"
-              class="h-4 w-4 md:h-5 md:w-5 ml-1"
-            />
-          </UBadge>
-        </ClientOnly>
+        <UBadge
+          class="text-sm md:text-xl mx-1"
+          :color="$dbhelper?.connected.value ? 'green' : 'red'"
+        >
+          connection
+          <UIcon
+            v-if="$dbhelper?.connected.value"
+            name="i-carbon-connection-signal"
+            class="h-4 w-4 md:h-5 md:w-5 ml-1"
+          />
+          <UIcon
+            v-else
+            name="i-carbon-connection-signal-off"
+            class="h-4 w-4 md:h-5 md:w-5 ml-1"
+          />
+        </UBadge>
+        <UBadge
+          class="text-sm md:text-xl mx-1"
+          :color="$dbhelper?.authenticated.value ? 'green' : 'red'"
+        >
+          authentication
+          <UIcon
+            v-if="$dbhelper?.authenticated.value"
+            name="i-carbon-rule-locked"
+            class="h-4 w-4 md:h-5 md:w-5 ml-1"
+          />
+          <UIcon
+            v-else
+            name="i-carbon-rule-cancelled"
+            class="h-4 w-4 md:h-5 md:w-5 ml-1"
+          />
+        </UBadge>
       </div>
       <div class="self-end">
-        <ClientOnly>
-          <UButton
-            v-if="$dbhelper?.authenticated.value"
-            class="text-sm md:text-xl py-1 transition hover:scale-110"
-            color="red"
-            @click="signout"
-          >
-            signout<UIcon
-              name="i-heroicons-arrow-small-right-20-solid"
-              class="h-4 w-4 md:h-5 md:w-5"
-            />
-          </UButton>
-        </ClientOnly>
+        <UButton
+          v-if="$dbhelper?.authenticated.value"
+          class="text-sm md:text-xl py-1 transition hover:scale-110"
+          color="red"
+          @click="signout"
+        >
+          signout<UIcon
+            name="i-heroicons-arrow-small-right-20-solid"
+            class="h-4 w-4 md:h-5 md:w-5"
+          />
+        </UButton>
       </div>
     </div>
     <slot />

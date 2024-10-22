@@ -6,6 +6,33 @@ let props = defineProps<{
   news: News;
 }>();
 
+watch(
+  () => props.news,
+  async () => {
+    if (!props || Object.keys(props.news).length === 0) return;
+    await $db?.wait();
+    if (!props.news.text_body || !props.news.html_body) {
+      try {
+        let ret: any = await $db.query<[string, string]>(
+          "select text_body, html_body from only $id",
+          {
+            id: props.news.id,
+          },
+        );
+        news.value.text_body = ret[0].text_body;
+        news.value.html_body = ret[0].html_body;
+      } catch (error: any) {
+        useToast().add({
+          title: "Error querying news",
+          description: error.toString(),
+          timeout: 0,
+        });
+      }
+    }
+  },
+  { deep: true, immediate: true },
+);
+
 const newtag = ref("");
 async function addTag() {
   newtag.value = newtag.value.trim();
@@ -28,6 +55,12 @@ watch(
     // only update if the last update was more than 2 seconds ago, to not overwrite user data
     if (new Date().getTime() - lastUpdate.getTime() > 2000 || !news.value.id) {
       Object.assign(news.value, props.news);
+      if (news.value.rating === -1) {
+        news.value.rating = undefined;
+      }
+      if (news.value.rating_travel === -1) {
+        news.value.rating_travel = undefined;
+      }
     }
   },
   { deep: true, immediate: true },
@@ -38,12 +71,22 @@ async function updateNews(field?: keyof News) {
   lastUpdate = new Date();
   // wait for the v-model to update...
   await new Promise((resolve) => setTimeout(resolve, 10));
+  if (!news.value.rating || news.value.rating < 0 || news.value.rating > 100) {
+    news.value.rating = 0;
+  }
+  if (
+    !news.value.rating_travel ||
+    news.value.rating_travel < 0 ||
+    news.value.rating_travel > 100
+  ) {
+    news.value.rating_travel = 0;
+  }
   try {
     const update: Partial<News> = field
       ? { [field]: news.value[field] }
       : news.value;
     console.log("update", update);
-    await $db?.merge<News>(news.value.id, update);
+    await $db?.merge<News>("news:" + news.value.id.split(":")[1], update);
   } catch (error: any) {
     useToast().add({
       title: "Error saving news",
@@ -58,6 +101,44 @@ async function updateNews(field?: keyof News) {
   <UCard>
     <template #header>
       <div class="flex flex-wrap">
+        <UBadge class="m-1">
+          <UInput
+            variant="none"
+            v-model.number="news.rating"
+            placeholder="0"
+            @input="updateNews('rating')"
+            type="number"
+            max="100"
+            min="0"
+            color="primary"
+            class="w-[6.5rem]"
+            :ui="{
+              trailing: { padding: { sm: 'pe-12' } },
+              padding: { sm: 'p-0' },
+            }"
+          >
+            <template #trailing>rating</template>
+          </UInput>
+        </UBadge>
+        <UBadge class="m-1">
+          <UInput
+            variant="none"
+            v-model.number="news.rating_travel"
+            placeholder="0"
+            @input="updateNews('rating_travel')"
+            type="number"
+            max="100"
+            min="0"
+            color="primary"
+            class="w-[6.5rem]"
+            :ui="{
+              trailing: { padding: { sm: 'pe-12' } },
+              padding: { sm: 'p-0' },
+            }"
+          >
+            <template #trailing>rating travel</template>
+          </UInput>
+        </UBadge>
         <UBadge class="m-1">
           {{ new Date(news.date).toLocaleString() }}
         </UBadge>
@@ -82,7 +163,7 @@ async function updateNews(field?: keyof News) {
           <div class="flex flex-wrap">
             <div
               v-for="tag of news.tags"
-              class="m-[0.1rem] bg-blue-500 rounded-lg px-1 group relative inline-block overflow-hidden"
+              class="m-[0.1rem] bg-green-500 rounded-lg px-1 group relative inline-block overflow-hidden"
               @click="
                 news.tags = news.tags?.filter((t) => t !== tag);
                 updateNews('tags');

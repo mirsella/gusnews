@@ -3,6 +3,5 @@ export default defineAppConfig({
     tooltip: {
       base: "text-lg h-auto whitespace-normal",
     },
-    primary: "blue",
   },
 });

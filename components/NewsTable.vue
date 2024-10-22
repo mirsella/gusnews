@@ -16,9 +16,16 @@ const columns = [
     sortable: true,
   },
   {
-    label: "Images",
-    key: "imgs",
-    sortable: false,
+    label: "Rating",
+    key: "rating",
+    sortable: true,
+    direction: "desc",
+  },
+  {
+    label: "Rating Travel",
+    key: "rating_travel",
+    sortable: true,
+    direction: "desc",
   },
   {
     label: "Tags",
@@ -59,7 +66,7 @@ function showTips() {
     description:
       "The columns sort options only apply to the current page. you can adjust how many news are shown per page.",
     icon: "i-carbon-information",
-    color: "blue",
+    color: "green",
     timeout: 7000,
   });
   toast.add({
@@ -68,7 +75,7 @@ function showTips() {
     description:
       "The more News per Page you have, the less responsive the page is.",
     icon: "i-carbon-information",
-    color: "blue",
+    color: "green",
     timeout: 7000,
   });
   toast.add({
@@ -77,7 +84,7 @@ function showTips() {
     description:
       "News a sorted by date by default, and only the news newer than one week has been fetched",
     icon: "i-carbon-information",
-    color: "blue",
+    color: "green",
     timeout: 7000,
   });
 }
@@ -91,22 +98,24 @@ watch(
 const news = useState<News[]>("news", () => []);
 
 const page = ref(1);
-const pageCount = ref(300);
+const pageCount = ref(500);
 watch(pageCount, async () => {
   page.value = 1;
 });
 const search = ref("");
 const onlyNonused = ref(true);
-let date = new Date();
-date.setHours(0, 0, 0, 0);
-date.setDate(date.getDate() - 2);
-const mindate = ref(date.toISOString().split("T")[0]);
+const mindate = ref("");
+const minrating = ref(0);
 const filteredNews = computed(() => {
+  if (minrating.value < 0) minrating.value = 0;
+  if (minrating.value > 100) minrating.value = 100;
   let date = new Date(mindate.value);
   let n = news.value;
   console.log("before filter", n.length, mindate.value);
   if (onlyNonused.value) n = n.filter((n) => !n.used);
   if (mindate.value != "") n = n.filter((n) => new Date(n.date) >= date);
+  if (minrating.value != 0)
+    n = n.filter((n) => (n.rating || 0) >= minrating.value);
   if (search.value) {
     n = n.filter(
       (n) =>
@@ -125,16 +134,17 @@ const paginedNews = computed(() =>
     page.value * pageCount.value,
   ),
 );
-if (process.client) {
+if (import.meta.client) {
   watch(
     paginedNews,
-    (paginedNews) => {
+    () => {
       setTimeout(async () => {
         const els = document.querySelectorAll("tbody > tr");
         console.log("registering click events", els.length);
         for (let el of els) {
           el.addEventListener("click", (event) => {
             const parent = el;
+            // @ts-ignore localName exists
             if (event.target?.localName === "td") {
               const id = parent.children[0].textContent;
               if (id) navigateTo({ query: { id } });
@@ -150,21 +160,27 @@ if (process.client) {
 const columnsChoice = columns
   .filter((c) => c.key != "hiddenid")
   .map((c) => c.key);
-const selectedColumns = ref<string[]>(["title", "imgs", "link"]);
-if (process.client) {
-  let localstorageColumns = window.localStorage.getItem("lme-selectedColumns");
+const selectedColumns = ref<string[]>([
+  "title",
+  "rating",
+  "tags",
+  "link",
+  "used",
+]);
+if (import.meta.client) {
+  let localstorageColumns = window.localStorage.getItem("gus-selectedColumns");
   if (localstorageColumns) {
     selectedColumns.value = JSON.parse(localstorageColumns);
   }
 
-  let newsperpage = window.localStorage.getItem("lme-NewsPerPage");
+  let newsperpage = window.localStorage.getItem("gus-NewsPerPage");
   if (newsperpage) pageCount.value = parseInt(newsperpage);
 
   watch(selectedColumns, async (v) =>
-    window.localStorage.setItem("lme-selectedColumns", JSON.stringify(v)),
+    window.localStorage.setItem("gus-selectedColumns", JSON.stringify(v)),
   );
   watch(pageCount, async (v) =>
-    window.localStorage.setItem("lme-NewsPerPage", v.toString()),
+    window.localStorage.setItem("gus-NewsPerPage", v.toString()),
   );
 }
 
@@ -180,7 +196,7 @@ const filteredColumns = computed(() => {
 async function updateUsed(row: News) {
   // need to inverse the value because the UI has not updated it yet
   const used = !row.used;
-  const res = await $db.merge<News>(row.id, { used });
+  const res = await $db.merge<News>("news:" + row.id.split(":")[1], { used });
   if (!res[0]) {
     setTimeout(async () => {
       row.used = true;
@@ -224,6 +240,15 @@ async function updateUsed(row: News) {
           <UInput v-model="mindate" type="date" size="lg" />
         </UTooltip>
 
+        <UTooltip text="minimum rating (only normal, not travel">
+          <UInput
+            v-model.number="minrating"
+            placeholder="minimun rating"
+            type="number"
+            size="lg"
+          />
+        </UTooltip>
+
         <UBadge color="gray">
           <UCheckbox v-model="onlyNonused" label="Non-used only" />
         </UBadge>
@@ -252,99 +277,98 @@ async function updateUsed(row: News) {
                 </span>
               </template>
             </UInput>
-            <ClientOnly>
-              <UPagination
-                v-model="page"
-                :page-count="pageCount"
-                :total="filteredNews.length"
-              />
-            </ClientOnly>
+            <UPagination
+              v-model="page"
+              :page-count="pageCount"
+              :total="filteredNews.length"
+            />
           </div>
         </UBadge>
       </div>
-      <ClientOnly>
-        <UTable
-          :loading="loading"
-          :rows="paginedNews"
-          :columns="filteredColumns"
-          class="w-full"
-          :ui="{
-            td: { base: 'max-w-[0] !p-2' },
-            tbody: 'divide-y divide-gray-200 dark:divide-slate-950',
-          }"
-        >
-          <template #hiddenid-data="{ row }">
-            {{ row.id }}
-          </template>
-          <template #imgs-data="{ row }">
-            <span
-              v-html="row.imgs"
-              class="my-4 grid grid-cols-2 gap-1 overflow-auto max-h-[30vw]"
-            ></span>
-          </template>
-          <template #used-data="{ row }">
-            <UToggle v-model="row.used" @click="updateUsed(row)" />
-          </template>
-          <template #tags-data="{ row }">
-            <UTooltip :text="row.tags?.join(', ')">
-              <div class="h-10 whitespace-normal truncate max-w-full">
-                {{ row.tags?.join(", ") }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #title-data="{ row }">
-            <UTooltip
-              :text="row.title"
-              class="whitespace-normal truncate h-10 max-w-full"
+      <UTable
+        :loading="loading"
+        :rows="paginedNews"
+        :columns="filteredColumns as any"
+        class="w-full"
+        :ui="{
+          td: { base: 'max-w-[0] !p-2' },
+        }"
+      >
+        <template #hiddenid-data="{ row }">
+          {{ row.id }}
+        </template>
+        <template #used-data="{ row }">
+          <UToggle v-model="row.used" @click="updateUsed(row)" />
+        </template>
+        <template #tags-data="{ row }">
+          <UTooltip :text="row.tags?.join(', ')">
+            <div class="h-10 whitespace-normal truncate max-w-full">
+              {{ row.tags?.join(", ") }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #rating-data="{ row }">
+          <div class="w-max-full w-min">
+            {{ row.rating != -1 ? row.rating : "" }}
+          </div>
+        </template>
+        <template #rating_travel-data="{ row }">
+          <div class="w-max-full w-min">
+            {{ row.rating_travel != -1 ? row.rating_travel : "" }}
+          </div>
+        </template>
+        <template #title-data="{ row }">
+          <UTooltip
+            :text="row.title"
+            class="whitespace-normal truncate h-10 max-w-full"
+          >
+            <div>
+              {{ row.title }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #caption-data="{ row }">
+          <UTooltip :text="row.caption">
+            <div class="whitespace-normal truncate h-10 max-w-full">
+              {{ row.caption }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #link-data="{ row }">
+          <UTooltip :text="row.link" class="max-w-full">
+            <a
+              :href="row.link"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="whitespace-normal truncate max-h-10 max-w-full"
+              >{{ row.link }}</a
             >
-              <div>
-                {{ row.title }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #caption-data="{ row }">
-            <UTooltip :text="row.caption">
-              <div class="whitespace-normal truncate h-10 max-w-full">
-                {{ row.caption }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #link-data="{ row }">
-            <UTooltip :text="row.link" class="max-w-full">
-              <a
-                :href="row.link"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="whitespace-normal truncate max-h-10 max-w-full"
-                >{{ row.link }}</a
-              >
-            </UTooltip>
-          </template>
-          <template #note-data="{ row }">
-            <UTooltip :text="row.note">
-              <div class="whitespace-normal truncate h-10 max-w-full">
-                {{ row.note }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #id-data="{ row }">
-            <UTooltip :text="row.id">
-              <div
-                class="max-w-full whitespace-normal text-ellipsis break-all max-h-10"
-              >
-                {{ row.id.split(":")[1] }}
-              </div>
-            </UTooltip>
-          </template>
-          <template #date-data="{ row }">
-            <UTooltip :text="new Date(row.date).toLocaleString()">
-              <div class="max-w-full whitespace-normal text-ellipsis w-min">
-                {{ new Date(row.date).toLocaleString() }}
-              </div>
-            </UTooltip>
-          </template>
-        </UTable>
-      </ClientOnly>
+          </UTooltip>
+        </template>
+        <template #note-data="{ row }">
+          <UTooltip :text="row.note">
+            <div class="whitespace-normal truncate h-10 max-w-full">
+              {{ row.note }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #id-data="{ row }">
+          <UTooltip :text="row.id">
+            <div
+              class="max-w-full whitespace-normal text-ellipsis break-all max-h-10"
+            >
+              {{ row.id.split(":")[1] }}
+            </div>
+          </UTooltip>
+        </template>
+        <template #date-data="{ row }">
+          <UTooltip :text="new Date(row.date).toLocaleString()">
+            <div class="max-w-full whitespace-normal text-ellipsis w-min">
+              {{ new Date(row.date).toLocaleString() }}
+            </div>
+          </UTooltip>
+        </template>
+      </UTable>
     </UCard>
   </div>
 </template>

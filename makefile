@@ -1,16 +1,16 @@
-BASE_URL ?= "/lmenews"
+BASE_URL ?= "/gusnews"
 
 all: build run
 
 build:
-	docker build -t lmenews --build-arg BASE_URL=${BASE_URL} .
+	docker build -t gusnews --build-arg BASE_URL=${BASE_URL} .
 
 run:
-	docker stop lmenews || true
-	docker rm lmenews || true
-	docker run -d --restart unless-stopped --name lmenews -p 3001:3000 lmenews
+	docker stop gusnews || true
+	docker rm gusnews || true
+	docker run -d --restart unless-stopped --name gusnews -p 3000:3000 gusnews
 
 clean:
-	docker stop lmenews || true
-	docker rm lmenews || true
-	docker rmi lmenews || true
+	docker stop gusnews || true
+	docker rm gusnews || true
+	docker rmi gusnews || true
