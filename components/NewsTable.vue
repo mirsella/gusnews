@@ -162,7 +162,7 @@ const columnsChoice = columns
   .map((c) => c.key);
 const selectedColumns = ref<string[]>([
   "title",
-  "rating",
+  "rating_travel",
   "tags",
   "link",
   "used",
