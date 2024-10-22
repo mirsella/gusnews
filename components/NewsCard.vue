@@ -130,9 +130,9 @@ async function updateNews(field?: keyof News) {
             max="100"
             min="0"
             color="primary"
-            class="w-[6.5rem]"
+            class="w-[8rem]"
             :ui="{
-              trailing: { padding: { sm: 'pe-12' } },
+              trailing: { padding: { sm: 'pe-20' } },
               padding: { sm: 'p-0' },
             }"
           >
@@ -163,7 +163,7 @@ async function updateNews(field?: keyof News) {
           <div class="flex flex-wrap">
             <div
               v-for="tag of news.tags"
-              class="m-[0.1rem] bg-green-500 rounded-lg px-1 group relative inline-block overflow-hidden"
+              class="m-[0.1rem] bg-blue-500 rounded-lg px-1 group relative inline-block overflow-hidden"
               @click="
                 news.tags = news.tags?.filter((t) => t !== tag);
                 updateNews('tags');

@@ -6,7 +6,7 @@ export default defineNuxtConfig({
   app: {
     baseURL: process.env.BASE_URL || "/",
     head: {
-      titleTemplate: "%s gusnews",
+      titleTemplate: "%s lmenews",
     },
   },
 

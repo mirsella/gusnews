@@ -66,7 +66,7 @@ function showTips() {
     description:
       "The columns sort options only apply to the current page. you can adjust how many news are shown per page.",
     icon: "i-carbon-information",
-    color: "green",
+    color: "blue",
     timeout: 7000,
   });
   toast.add({
@@ -75,7 +75,7 @@ function showTips() {
     description:
       "The more News per Page you have, the less responsive the page is.",
     icon: "i-carbon-information",
-    color: "green",
+    color: "blue",
     timeout: 7000,
   });
   toast.add({
@@ -84,7 +84,7 @@ function showTips() {
     description:
       "News a sorted by date by default, and only the news newer than one week has been fetched",
     icon: "i-carbon-information",
-    color: "green",
+    color: "blue",
     timeout: 7000,
   });
 }
