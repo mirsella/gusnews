@@ -7,6 +7,7 @@ export default defineNuxtConfig({
     baseURL: process.env.BASE_URL || "/",
     head: {
       titleTemplate: "%s lmenews",
+      link: [{ rel: "icon", type: "image/ico", href: "/favicon.ico" }],
     },
   },
 
