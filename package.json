@@ -11,15 +11,15 @@
     "postinstall": "nuxt prepare"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^3.2.4",
-    "@nuxt/ui": "^2.22.3",
-    "nuxt": "^3.21.6",
-    "vue": "^3.5.33",
-    "vue-router": "^4.6.4"
+    "@nuxt/devtools": "4.0.0-alpha.4",
+    "@nuxt/ui": "^4.7.1",
+    "nuxt": "^4.4.6",
+    "vue": "^3.5.34",
+    "vue-router": "^5.0.7"
   },
   "dependencies": {
-    "@iconify-json/carbon": "^1.1.37",
-    "surrealdb.js": "0.11.1"
+    "@iconify-json/carbon": "^1.2.21",
+    "surrealdb.js": "1.0.0"
   },
   "pnpm": {
     "overrides": {
