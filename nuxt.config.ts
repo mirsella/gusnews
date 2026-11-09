@@ -13,6 +13,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     public: {
+      posthogKey: "",
+      posthogHost: "https://eu.i.posthog.com",
+      posthogEnvironment: "production",
       surrealdb_urls: [
         "https://db.lemediapositif.com",
         "http://db.lemediapositif.com",
