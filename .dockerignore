@@ -1,4 +1,7 @@
 ### NuxtJS
+.git
+.env
+.scratch
 # Generated dirs
 dist
 .nuxt
@@ -11,4 +14,3 @@ node_modules
 
 # System files
 *.log
-

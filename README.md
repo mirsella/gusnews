@@ -110,6 +110,16 @@ The container exposes port `3000` and runs Nuxt from `.output/server/index.mjs`.
 
 [`news-scraper`](https://github.com/mirsella/news-scraper) is the backend pipeline that fetches articles, parses content, stores normalized records in SurrealDB, and uses OpenAI to generate ratings and tags. Run it first when you need a local or fresh dataset for `gusnews`.
 
+## Production analytics
+
+Runtime settings: `NUXT_PUBLIC_POSTHOG_KEY` (public `phc_` project token), `NUXT_PUBLIC_POSTHOG_HOST=https://eu.i.posthog.com`, and `NUXT_PUBLIC_POSTHOG_ENVIRONMENT=production`. Never expose a personal API key. Missing project keys disable telemetry with a warning.
+
+Anonymous events record pageviews, external article link clicks, connection/authentication state, and sanitized errors. Credentials, URL queries/fragments, campaign/search parameters, text autocapture, and session replay are excluded. Browser logs have a separate URL sanitizer. Server requests are not visitor counts; blockers can prevent browser delivery. Validation visits with `?telemetry_test=1` are excluded from traffic dashboard tiles.
+
+Count daily distinct browser IDs on `authenticated_visit` for logged-in activity, not distinct accounts or event totals. It records validated authentication, authenticated routes, and visible focus/input on a new Paris day. Idle tabs do not generate visits by timer.
+
+Run `bun test tests/telemetry.test.ts`. [Production dashboard](https://eu.posthog.com/project/342382/dashboard/1099393). This checkout keeps its Nuxt 4 dependencies; the VPS still uses the org's Nuxt 3 build. Both use Node 22 runtime images.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
