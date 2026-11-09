@@ -1,14 +1,7 @@
-### NuxtJS
-# Generated dirs
-dist
-.nuxt
-.nuxt-*
-.output
-.gen
-
-# Node dependencies
+.git
 node_modules
-
-# System files
+.nuxt
+.output
+.env
+.scratch
 *.log
-
