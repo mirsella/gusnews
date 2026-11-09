@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { $db, $dbhelper } = useNuxtApp();
-import type { News } from "~/utils/news";
+import { toNews, updateFeed, type News, type NewsRecord } from "~/utils/news";
+import { Table } from "surrealdb";
 const route = useRoute();
 const news = useState<News[]>("news", () => []);
 
@@ -8,11 +9,12 @@ const region: string = route.params.feed as string;
 
 const queryStatus = ref("waiting for the connection to the db...");
 let queryLoading = ref(true);
-onMounted(async () => {
-  while (!$dbhelper.authenticated.value || !$dbhelper.activated.value) {
-    await new Promise((resolve) => setTimeout(resolve, 10));
-  }
-  (async () => {
+watch(
+  () => $dbhelper.authenticated.value && $dbhelper.activated.value,
+  async (ready, _, onCleanup) => {
+    if (!ready) return;
+    const controller = new AbortController();
+    onCleanup(() => controller.abort());
     queryStatus.value = "loading news...";
     queryLoading.value = true;
     await $db.ready;
@@ -20,27 +22,25 @@ onMounted(async () => {
       const t1 = performance.now();
       let result;
       if (region) {
-        result = await $db.query<[News[]]>(
+        result = await $db.query<[NewsRecord[]]>(
           "select * omit text_body, html_body from news where date >= time::now() - 1w AND $region INSIDE tags order by date desc",
           { region },
         );
       } else {
-        result = await $db.query<[News[]]>(
+        result = await $db.query<[NewsRecord[]]>(
           "select * omit text_body, html_body from news where date >= time::now() - 1w order by date desc",
         );
       }
-      if (!result[0].length) throw new Error("no news found");
-      result[0].forEach((n) => {
-        if (n.rating === undefined) n.rating = -1;
-        if (n.rating_travel === undefined) n.rating_travel = -1;
-      });
-      news.value = result[0] ?? [];
+      if (controller.signal.aborted) return;
+      news.value = result[0].map(toNews);
       const t2 = performance.now();
       const totaltime = (t2 - t1).toFixed(0);
       queryStatus.value = `loaded ${news.value.length} news in ${totaltime}ms.`;
       queryLoading.value = false;
+      const live = await $db.withSignal(controller.signal).live<NewsRecord>(new Table("news"));
+      live.subscribe((event) => updateFeed(news.value, event, region));
     } catch (e: any) {
-      if (import.meta.server) return;
+      if (controller.signal.aborted) return;
       useToast().add({
         title: "Error querying news",
         description: e.toString(),
@@ -48,42 +48,9 @@ onMounted(async () => {
         timeout: 0,
       });
     }
-  })();
-
-  try {
-    await $db.wait();
-    const liveQueryUuid = await $db?.live("news", ({ action, result }) => {
-      if (!result) return;
-      let new_news = result as News;
-      if (new_news.rating === undefined) new_news.rating = -1;
-      if (new_news.rating_travel === undefined) new_news.rating_travel = -1;
-      if (!new_news.tags?.includes(region)) return;
-      switch (action) {
-        case "CREATE":
-          news.value.unshift(new_news);
-          break;
-        case "UPDATE":
-          const index = news.value.findIndex((n) => n.id === new_news.id);
-          if (index !== -1) news.value[index] = result as News;
-          break;
-        case "DELETE":
-          const index2 = news.value.findIndex((n) => n.id === new_news.id);
-          if (index2 !== -1) news.value.splice(index2, 1);
-          break;
-      }
-    });
-    onUnmounted(async () => {
-      await $db?.kill(liveQueryUuid);
-    });
-  } catch (e: any) {
-    useToast().add({
-      title: "Error starting live query",
-      description: e.toString(),
-      color: "red",
-      timeout: 0,
-    });
-  }
-});
+  },
+  { immediate: true },
+);
 
 const isOpen = computed<boolean>({
   get: () => route?.query.id !== undefined && route?.query.id !== "",

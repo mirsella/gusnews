@@ -1,40 +1,31 @@
-import { Surreal } from "surrealdb.js";
+import { Surreal } from "surrealdb";
 
-const db = new Surreal({
-  onClose() {
-    connected.value = false;
-    authenticated.value = false;
-    activated.value = false;
-  },
-});
+const db = new Surreal();
 const authenticated = ref(false);
 const connected = ref(false);
 const activated = ref(false);
+db.subscribe("connected", () => { connected.value = true; });
+db.subscribe("disconnected", () => { connected.value = false; });
+db.subscribe("auth", (tokens) => {
+  authenticated.value = Boolean(tokens);
+  if (!tokens) activated.value = false;
+});
 
 let alreadyFailed = false;
 async function connect() {
   connected.value = false;
   const config = useRuntimeConfig();
-  let urls = config.public.surrealdb_urls;
+  const urls = [...config.public.surrealdb_urls];
   if (process.env.NODE_ENV === "development") {
     urls.push("http://localhost:8000");
   }
-  if (!urls.length) {
-    alert("no database urls found configured");
-  }
   try {
-    console.log("testing urls", urls);
-    let fetchPromises = urls.map(
-      (url) =>
-        new Promise((resolve) => {
-          fetch(url, { method: "HEAD", redirect: "manual" })
-            .then(() => resolve(url))
-            .catch(() => null);
-        }),
-    );
-
-    const url: any = await Promise.race(fetchPromises);
-    console.log("fastest url is", url);
+    if (!urls.length) throw new Error("No database URLs configured");
+    const url = await Promise.any(urls.map(async (url) => {
+      const response = await fetch(new URL("/health", url), { signal: AbortSignal.timeout(5000) });
+      if (!response.ok) throw new Error(`Database health check returned ${response.status}`);
+      return new URL("/rpc", url).href.replace(/^http/, "ws");
+    }));
     await db.connect(url, {
       namespace: "news",
       database: "news",
@@ -54,18 +45,14 @@ async function connect() {
   }
 }
 
-async function login(): Promise<Boolean> {
+async function login(): Promise<boolean> {
   const jwt = localStorage.getItem("jwt");
   if (!jwt) return false;
   try {
-    const auth = await db.authenticate(jwt);
-    if (auth) {
-      authenticated.value = true;
-      update_activated();
-      return true;
-    } else {
-      throw new Error("Failed to authenticate");
-    }
+    await db.authenticate(jwt);
+    authenticated.value = true;
+    await update_activated();
+    return true;
   } catch (error: any) {
     authenticated.value = false;
     window.localStorage.removeItem("jwt");
@@ -81,8 +68,8 @@ async function login(): Promise<Boolean> {
 
 async function update_activated() {
   try {
-    const user: any = await db.info();
-    if (user.activated) {
+    const user = await db.auth<{ activated: boolean }>();
+    if (user?.activated) {
       activated.value = true;
     } else {
       throw new Error("User not activated");

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { News } from "~/utils/news";
+import { StringRecordId } from "surrealdb";
 const { $db } = useNuxtApp();
 
 let props = defineProps<{
@@ -10,13 +11,13 @@ watch(
   () => props.news,
   async () => {
     if (!props || Object.keys(props.news).length === 0) return;
-    await $db?.wait();
+    await $db.ready;
     if (!props.news.text_body || !props.news.html_body) {
       try {
-        let ret: any = await $db.query<[string, string]>(
+        const ret = await $db.query<[Pick<News, "text_body" | "html_body">]>(
           "select text_body, html_body from only $id",
           {
-            id: props.news.id,
+            id: new StringRecordId(props.news.id),
           },
         );
         news.value.text_body = ret[0].text_body;
@@ -86,7 +87,7 @@ async function updateNews(field?: keyof News) {
       ? { [field]: news.value[field] }
       : news.value;
     console.log("update", update);
-    await $db?.merge<News>("news:" + news.value.id.split(":")[1], update);
+    await $db.update<News>(new StringRecordId(news.value.id)).merge(update);
   } catch (error: any) {
     useToast().add({
       title: "Error saving news",
