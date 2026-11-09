@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { News } from "~/utils/news";
+import { StringRecordId } from "surrealdb";
 const { $db } = useNuxtApp();
 const columns = [
   {
@@ -196,8 +197,8 @@ const filteredColumns = computed(() => {
 async function updateUsed(row: News) {
   // need to inverse the value because the UI has not updated it yet
   const used = !row.used;
-  const res = await $db.merge<News>("news:" + row.id.split(":")[1], { used });
-  if (!res[0]) {
+  const res = await $db.update<News>(new StringRecordId(row.id)).merge({ used });
+  if (!res) {
     setTimeout(async () => {
       row.used = true;
       let n = news.value.find((n) => n.id === row.id) || ({} as any);

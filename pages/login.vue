@@ -14,12 +14,10 @@ async function signin() {
     const jwt = await $db.signin({
       namespace: "news",
       database: "news",
-      scope: "user",
-      name: user.value,
-      password: password.value,
+      access: "user",
+      variables: { name: user.value, password: password.value },
     });
-    if (!jwt) throw new Error("didn't get a jwt");
-    window.localStorage.setItem("jwt", jwt);
+    window.localStorage.setItem("jwt", jwt.access);
     $dbhelper.update_activated();
     $dbhelper.authenticated.value = true;
     await navigateTo("/");
@@ -40,11 +38,10 @@ async function signup() {
     let token = await $db.signup({
       namespace: "news",
       database: "news",
-      scope: "user",
-      name: user.value,
-      password: password.value,
+      access: "user",
+      variables: { name: user.value, password: password.value },
     });
-    window.localStorage.setItem("jwt", token);
+    window.localStorage.setItem("jwt", token.access);
     $dbhelper.authenticated.value = true;
     toast.add({
       id: "signup_success",

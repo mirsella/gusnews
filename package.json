@@ -21,6 +21,6 @@
     "@iconify-json/carbon": "^1.1.37",
     "posthog-js": "^1.447.5",
     "posthog-node": "^5.64.0",
-    "surrealdb.js": "0.11.1"
+    "surrealdb": "2.2.2"
   }
 }
