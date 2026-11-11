@@ -4,6 +4,7 @@ import { cleanTelemetry as clean } from "../utils/telemetry";
 
 export default defineNuxtPlugin((app) => {
   const config = useRuntimeConfig().public;
+  const { site } = useAppConfig();
   if (!config.posthogKey) {
     console.warn("PostHog disabled: NUXT_PUBLIC_POSTHOG_KEY is not configured");
     return;
@@ -24,7 +25,7 @@ export default defineNuxtPlugin((app) => {
     property_denylist: ["$search", "$initial_search", "$hash", "$initial_hash"],
     mask_all_text: true,
     mask_all_element_attributes: true,
-    logs: { serviceName: "gusnews-web", environment: String(config.posthogEnvironment), captureConsoleLogs: false,
+    logs: { serviceName: `${site}-web`, environment: String(config.posthogEnvironment), captureConsoleLogs: false,
       beforeSend: (record) => ({ ...record, body: clean(record.body),
         attributes: { ...clean(record.attributes), "url.full": currentUrl() } }),
     },
@@ -39,7 +40,7 @@ export default defineNuxtPlugin((app) => {
       return event;
     },
   });
-  posthog.register({ service: "gusnews-web", site: "gusnews", environment: config.posthogEnvironment,
+  posthog.register({ service: `${site}-web`, site, environment: config.posthogEnvironment,
     telemetry_test: new URLSearchParams(location.search).get("telemetry_test") === "1" });
   let authenticated = false;
   let lastVisitDate = "";

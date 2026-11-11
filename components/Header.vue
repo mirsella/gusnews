@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const site = useSite();
 const { $db, $dbhelper } = useNuxtApp();
 
 async function signout() {
@@ -12,7 +13,15 @@ async function signout() {
   <div>
     <div class="inline-flex w-full pt-1 md:py-4 px-4 h-auto">
       <dev class="text-2xl self-start">
-        <span class="hidden sm:block"> Gusnews </span>
+        <span class="hidden sm:inline-block">
+          <img
+            v-if="site.logo"
+            src="~/assets/logo-lme.png"
+            alt="logo"
+            class="h-8 w-8 inline-block"
+          />
+          {{ site.title }}</span
+        >
         <span class="sm:hidden mt-2">
           <UIcon name="i-heroicons-home" />
         </span>
@@ -20,7 +29,7 @@ async function signout() {
       <div class="flex-grow self-center text-center">
         <UBadge
           class="text-sm md:text-xl mx-1"
-          :color="$dbhelper?.connected.value ? 'green' : 'red'"
+          :color="$dbhelper?.connected.value ? 'primary' : 'red'"
         >
           connection
           <UIcon
@@ -36,7 +45,7 @@ async function signout() {
         </UBadge>
         <UBadge
           class="text-sm md:text-xl mx-1"
-          :color="$dbhelper?.authenticated.value ? 'green' : 'red'"
+          :color="$dbhelper?.authenticated.value ? 'primary' : 'red'"
         >
           authentication
           <UIcon

@@ -27,6 +27,7 @@ test("preserves ingestion token, sanitizes browser logs, and tracks only authent
   globals.window = new EventTarget();
   globals.document = Object.assign(new EventTarget(), { visibilityState: "visible" });
   globals.defineNuxtPlugin = (plugin: any) => plugin;
+  globals.useAppConfig = () => ({ site: "lmenews" });
   globals.useRuntimeConfig = () => ({ public: {
     posthogKey: "phc_test", posthogHost: "https://eu.i.posthog.com", posthogEnvironment: "test",
   } });

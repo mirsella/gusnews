@@ -8,21 +8,25 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [20.x]
+        site: [gusnews, lmenews]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Set up Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 22.x
+          cache: pnpm
 
-      - name: setup pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: 8
-          run_install: true
+      - run: pnpm install --frozen-lockfile
 
-      - name: Build
+      - name: Test
+        run: pnpm test
+
+      - name: Build ${{ matrix.site }}
         run: pnpm build
+        env:
+          SITE: ${{ matrix.site }}
+          BASE_URL: /${{ matrix.site }}

@@ -3,7 +3,7 @@ import { PostHog } from "posthog-node";
 export default defineNitroPlugin((nitro) => {
   const config = useRuntimeConfig().public;
   if (!config.posthogKey) { console.warn("PostHog server telemetry disabled: missing project key"); return; }
-  const service = "gusnews-server";
+  const service = `${useAppConfig().site}-server`;
   const host = String(config.posthogHost).replace(/\/$/, "");
   const key = String(config.posthogKey);
   if (!key.startsWith("phc_") || !host.startsWith("https://")) throw new Error("PostHog requires HTTPS and a public project token");

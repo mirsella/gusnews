@@ -1,15 +1,25 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
+import { siteName } from "./sites";
+
+const site = siteName(process.env.SITE);
+const baseURL = process.env.BASE_URL || "/";
+
 export default defineNuxtConfig({
   modules: ["@nuxt/ui"],
   ssr: false,
 
   app: {
-    baseURL: process.env.BASE_URL || "/",
+    baseURL,
     head: {
-      titleTemplate: "%s gusnews",
-      link: [{ rel: "icon", type: "image/ico", href: "/favicon.ico" }],
+      titleTemplate: `%s ${site}`,
+      link: [{ rel: "icon", type: "image/ico", href: `${baseURL.replace(/\/$/, "")}/favicon.ico` }],
     },
   },
+
+  // Each site has its own public dir (favicon).
+  dir: { public: `public/${site}` },
+
+  appConfig: { site },
 
   runtimeConfig: {
     public: {
